@@ -14,12 +14,16 @@ struct RagReply {
     std::string answer;
     std::vector<RagHit> sources;
     long long retrievalMs = 0, generationMs = 0;
+    bool usedRag = true;
+    bool contextReduced = false;
+    bool invalidCitations = false;
+    GenerationStats generation;
     std::string displayText() const;
 };
 class RagChat {
 public:
-    explicit RagChat(std::filesystem::path baseDirectory);
-    RagReply ask(const std::string& question);
+    explicit RagChat(std::filesystem::path baseDirectory, double temperature = 0);
+    RagReply ask(const std::string& question, bool useRag = true);
     std::vector<RagHit> retrieve(const std::string& question) const;
     size_t addFile(const std::filesystem::path& file, const IndexProgress& progress = {});
 private:

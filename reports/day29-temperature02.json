@@ -1,0 +1,297 @@
+{
+  "cloud_comparison": "not run: no cloud provider configured in this application",
+  "embedding_model": "bge-m3",
+  "expected_term_passes": 6,
+  "generation_model": "qwen3:8b",
+  "profile": {
+    "num_ctx": 8192,
+    "num_predict": 512,
+    "temperature": 0.2
+  },
+  "quality_check": "case-insensitive expected-term check; not a complete factuality evaluation",
+  "runs": [
+    {
+      "answer": "Модель эмбеддингов по умолчанию в DocumentIndexer::embedTexts — это `bge-m3`, как указано в README.md [4].",
+      "case": 1,
+      "context_reduced": true,
+      "expected_term": "bge-m3",
+      "expected_term_present": true,
+      "generation_ms": 10025,
+      "input_tokens": 1358,
+      "input_upper_bound": 5584,
+      "invalid_citations": false,
+      "output_tokens": 40,
+      "question": "Какая модель эмбеддингов используется по умолчанию в DocumentIndexer::embedTexts?",
+      "repeat": 1,
+      "retrieval_ms": 7305,
+      "sources": [
+        {
+          "chunk_id": "document_indexer.cpp:structural:0027",
+          "content": "bool DocumentIndexer::validSearchRequest(const std::string& query, int topK) {\n    return !trim(query).empty() && query.size() <= 16000 && topK >= 1 && topK <= 20;\n}\nstd::vector<size_t> DocumentIndexer::rankVectors(const std::vector<float>& query,\n        const std::vector<std::vector<float>>& vectors, int topK) {\n    std::vector<size_t> order(vectors.size());\n    for (size_t i = 0; i < order.size(); ++i) order[i] = i;\n    std::stable_sort(order.begin(), order.end(), [&](size_t a, size_t b) {\n        return cosineSimilarity(query, vectors[a]) > cosineSimilarity(query, vectors[b]);\n    });\n    if (topK >= 0 && order.size() > static_cast<size_t>(topK)) order.resize(topK);\n    return order;\n}\nbool DocumentIndexer::embedTexts(const std::vector<std::string>& texts,\n        std::vector<std::vector<float>>& vectors, std::string& error) {\n    vectors.clear(); error.clear();\n    for (size_t start = 0; start < texts.size(); start += kBatchSize) {\n",
+          "cosine": 0.5785555918425764,
+          "file": "document_indexer.cpp",
+          "relevance": 0.6285555918425765
+        },
+        {
+          "chunk_id": "document_indexer.h:structural:0007",
+          "content": "class DocumentIndexer {\npublic:\n    DocumentIndexer();\n    ~DocumentIndexer();\n    std::string statusJson();\n    bool start(std::string& error);\n    bool ensureReady(bool& ready, std::string& error);\n    bool retrieve(const std::string& query, int topK, std::vector<SearchHit>& hits, std::string& error);\n    static std::vector<Chunk> structuralChunks(const Document& document, size_t maxChunk=2200);\n    static double cosineSimilarity(const std::vector<float>& a, const std::vector<float>& b);\n    static bool validSearchRequest(const std::string& query, int topK);\n    static std::vector<size_t> rankVectors(const std::vector<float>& query, const std::vector<std::vector<float>>& vectors, int topK);\n    static std::string databasePath();\n    static CorpusStats inspectCorpus(const std::string& root);\n    static bool embedTexts(const std::vector<std::string>& texts, std::vector<std::vector<float>>& vectors, std::string& error);\nprivate:\n    void runJob();\n    bool hasIndex(std::string& error) const;\n",
+          "cosine": 0.563578953335313,
+          "file": "document_indexer.h",
+          "relevance": 0.563578953335313
+        },
+        {
+          "chunk_id": "document_indexer.cpp:structural:0032",
+          "content": "void DocumentIndexer::runJob() {\n    std::string error;\n    try {\n        const auto started = std::chrono::steady_clock::now();\n        CorpusStats corpus;\n        const auto documents = loadDocuments(fs::current_path(), corpus);\n        std::vector<Chunk> chunks;\n        for (const auto& document : documents) {\n            auto more = structuralChunks(document);\n            chunks.insert(chunks.end(), std::make_move_iterator(more.begin()), std::make_move_iterator(more.end()));\n        }\n        if (chunks.empty()) throw std::runtime_error(\"No project source documents found\");\n        {\n            std::lock_guard<std::mutex> lock(mutex_);\n            corpus_ = corpus; phase_ = \"Generating embeddings\"; progressTotal_ = static_cast<int>(chunks.size());\n        }\n        std::vector<std::vector<float>> vectors;\n        size_t dimension = 0;\n        for (size_t i = 0; i < chunks.size(); i += kBatchSize) {\n            std::vector<std::string> batch;\n",
+          "cosine": 0.5604258194467314,
+          "file": "document_indexer.cpp",
+          "relevance": 0.5604258194467314
+        },
+        {
+          "chunk_id": "README.md:structural:0003",
+          "content": "## Stack\n\nC++17, CMake, libcurl, SQLite, HTML, CSS, JavaScript, Ollama `/api/embed` (`bge-m3` by default).",
+          "cosine": 0.5590961632187191,
+          "file": "README.md",
+          "relevance": 0.5590961632187191
+        }
+      ],
+      "tokens_per_second": 45.812192915144365,
+      "truncated": false
+    },
+    {
+      "answer": "Модель эмбеддингов по умолчанию для `DocumentIndexer::embedTexts` — это `bge-m3`, как указано в разделе Stack в README.md [4].",
+      "case": 1,
+      "context_reduced": true,
+      "expected_term": "bge-m3",
+      "expected_term_present": true,
+      "generation_ms": 9594,
+      "input_tokens": 1358,
+      "input_upper_bound": 5584,
+      "invalid_citations": false,
+      "output_tokens": 46,
+      "question": "Какая модель эмбеддингов используется по умолчанию в DocumentIndexer::embedTexts?",
+      "repeat": 2,
+      "retrieval_ms": 5478,
+      "sources": [
+        {
+          "chunk_id": "document_indexer.cpp:structural:0027",
+          "content": "bool DocumentIndexer::validSearchRequest(const std::string& query, int topK) {\n    return !trim(query).empty() && query.size() <= 16000 && topK >= 1 && topK <= 20;\n}\nstd::vector<size_t> DocumentIndexer::rankVectors(const std::vector<float>& query,\n        const std::vector<std::vector<float>>& vectors, int topK) {\n    std::vector<size_t> order(vectors.size());\n    for (size_t i = 0; i < order.size(); ++i) order[i] = i;\n    std::stable_sort(order.begin(), order.end(), [&](size_t a, size_t b) {\n        return cosineSimilarity(query, vectors[a]) > cosineSimilarity(query, vectors[b]);\n    });\n    if (topK >= 0 && order.size() > static_cast<size_t>(topK)) order.resize(topK);\n    return order;\n}\nbool DocumentIndexer::embedTexts(const std::vector<std::string>& texts,\n        std::vector<std::vector<float>>& vectors, std::string& error) {\n    vectors.clear(); error.clear();\n    for (size_t start = 0; start < texts.size(); start += kBatchSize) {\n",
+          "cosine": 0.5785555918425764,
+          "file": "document_indexer.cpp",
+          "relevance": 0.6285555918425765
+        },
+        {
+          "chunk_id": "document_indexer.h:structural:0007",
+          "content": "class DocumentIndexer {\npublic:\n    DocumentIndexer();\n    ~DocumentIndexer();\n    std::string statusJson();\n    bool start(std::string& error);\n    bool ensureReady(bool& ready, std::string& error);\n    bool retrieve(const std::string& query, int topK, std::vector<SearchHit>& hits, std::string& error);\n    static std::vector<Chunk> structuralChunks(const Document& document, size_t maxChunk=2200);\n    static double cosineSimilarity(const std::vector<float>& a, const std::vector<float>& b);\n    static bool validSearchRequest(const std::string& query, int topK);\n    static std::vector<size_t> rankVectors(const std::vector<float>& query, const std::vector<std::vector<float>>& vectors, int topK);\n    static std::string databasePath();\n    static CorpusStats inspectCorpus(const std::string& root);\n    static bool embedTexts(const std::vector<std::string>& texts, std::vector<std::vector<float>>& vectors, std::string& error);\nprivate:\n    void runJob();\n    bool hasIndex(std::string& error) const;\n",
+          "cosine": 0.563578953335313,
+          "file": "document_indexer.h",
+          "relevance": 0.563578953335313
+        },
+        {
+          "chunk_id": "document_indexer.cpp:structural:0032",
+          "content": "void DocumentIndexer::runJob() {\n    std::string error;\n    try {\n        const auto started = std::chrono::steady_clock::now();\n        CorpusStats corpus;\n        const auto documents = loadDocuments(fs::current_path(), corpus);\n        std::vector<Chunk> chunks;\n        for (const auto& document : documents) {\n            auto more = structuralChunks(document);\n            chunks.insert(chunks.end(), std::make_move_iterator(more.begin()), std::make_move_iterator(more.end()));\n        }\n        if (chunks.empty()) throw std::runtime_error(\"No project source documents found\");\n        {\n            std::lock_guard<std::mutex> lock(mutex_);\n            corpus_ = corpus; phase_ = \"Generating embeddings\"; progressTotal_ = static_cast<int>(chunks.size());\n        }\n        std::vector<std::vector<float>> vectors;\n        size_t dimension = 0;\n        for (size_t i = 0; i < chunks.size(); i += kBatchSize) {\n            std::vector<std::string> batch;\n",
+          "cosine": 0.5604258194467314,
+          "file": "document_indexer.cpp",
+          "relevance": 0.5604258194467314
+        },
+        {
+          "chunk_id": "README.md:structural:0003",
+          "content": "## Stack\n\nC++17, CMake, libcurl, SQLite, HTML, CSS, JavaScript, Ollama `/api/embed` (`bge-m3` by default).",
+          "cosine": 0.5590961632187191,
+          "file": "README.md",
+          "relevance": 0.5590961632187191
+        }
+      ],
+      "tokens_per_second": 45.45319802772645,
+      "truncated": false
+    },
+    {
+      "answer": "Максимальная длина query в DocumentIndexer::validSearchRequest составляет 16000 байт [1].",
+      "case": 2,
+      "context_reduced": true,
+      "expected_term": "16000",
+      "expected_term_present": true,
+      "generation_ms": 9411,
+      "input_tokens": 1568,
+      "input_upper_bound": 6537,
+      "invalid_citations": false,
+      "output_tokens": 29,
+      "question": "Какова максимальная длина query в DocumentIndexer::validSearchRequest?",
+      "repeat": 1,
+      "retrieval_ms": 5898,
+      "sources": [
+        {
+          "chunk_id": "document_indexer.cpp:structural:0027",
+          "content": "bool DocumentIndexer::validSearchRequest(const std::string& query, int topK) {\n    return !trim(query).empty() && query.size() <= 16000 && topK >= 1 && topK <= 20;\n}\nstd::vector<size_t> DocumentIndexer::rankVectors(const std::vector<float>& query,\n        const std::vector<std::vector<float>>& vectors, int topK) {\n    std::vector<size_t> order(vectors.size());\n    for (size_t i = 0; i < order.size(); ++i) order[i] = i;\n    std::stable_sort(order.begin(), order.end(), [&](size_t a, size_t b) {\n        return cosineSimilarity(query, vectors[a]) > cosineSimilarity(query, vectors[b]);\n    });\n    if (topK >= 0 && order.size() > static_cast<size_t>(topK)) order.resize(topK);\n    return order;\n}\nbool DocumentIndexer::embedTexts(const std::vector<std::string>& texts,\n        std::vector<std::vector<float>>& vectors, std::string& error) {\n    vectors.clear(); error.clear();\n    for (size_t start = 0; start < texts.size(); start += kBatchSize) {\n",
+          "cosine": 0.6397245435466054,
+          "file": "document_indexer.cpp",
+          "relevance": 0.7497245435466053
+        },
+        {
+          "chunk_id": "document_indexer.h:structural:0007",
+          "content": "class DocumentIndexer {\npublic:\n    DocumentIndexer();\n    ~DocumentIndexer();\n    std::string statusJson();\n    bool start(std::string& error);\n    bool ensureReady(bool& ready, std::string& error);\n    bool retrieve(const std::string& query, int topK, std::vector<SearchHit>& hits, std::string& error);\n    static std::vector<Chunk> structuralChunks(const Document& document, size_t maxChunk=2200);\n    static double cosineSimilarity(const std::vector<float>& a, const std::vector<float>& b);\n    static bool validSearchRequest(const std::string& query, int topK);\n    static std::vector<size_t> rankVectors(const std::vector<float>& query, const std::vector<std::vector<float>>& vectors, int topK);\n    static std::string databasePath();\n    static CorpusStats inspectCorpus(const std::string& root);\n    static bool embedTexts(const std::vector<std::string>& texts, std::vector<std::vector<float>>& vectors, std::string& error);\nprivate:\n    void runJob();\n    bool hasIndex(std::string& error) const;\n",
+          "cosine": 0.6438533008646078,
+          "file": "document_indexer.h",
+          "relevance": 0.6538533008646078
+        },
+        {
+          "chunk_id": "web_server.cpp:structural:0031",
+          "content": "} else if (useRag) {\n                        if (!document_index::DocumentIndexer::validSearchRequest(prompt, 5)) {\n                            success = false; error = \"RAG query is empty or too long\";\n                        } else {\n                            success = documentIndexer.ensureReady(ready, error);\n                            if (success && ready) {\n                                std::vector<document_index::SearchHit> hits;\n                                success = documentIndexer.retrieve(prompt, 5, hits, error);\n                                if (success) {\n                                    context = \"{\\\"retrieved_chunks\\\":[\";\n                                    for (const auto& hit : hits) {\n                                        if (!sources.empty()) context += ',';\n                                        // Limit text sent to the model, keeping UTF-8 boundaries intact.\n                                        size_t end = std::min<size_t>(hit.chunk.content.size(), 6000);\n",
+          "cosine": 0.5890124316587722,
+          "file": "web_server.cpp",
+          "relevance": 0.6490124316587722
+        },
+        {
+          "chunk_id": "document_indexer.cpp:structural:0035",
+          "content": "std::string DocumentIndexer::statusJson() {\n    std::lock_guard<std::mutex> lock(mutex_);\n    std::string error;\n    const bool ready = !running_ && hasIndex(error);\n    if (error.empty()) error = jobError_;\n    return \"{\\\"ready\\\":\" + std::string(ready ? \"true\" : \"false\") +\n        \",\\\"running\\\":\" + (running_ ? \"true\" : \"false\") + \",\\\"phase\\\":\\\"\" + escape(phase_) +\n        \"\\\",\\\"progress\\\":\" + std::to_string(progress_) + \",\\\"total\\\":\" + std::to_string(progressTotal_) +\n        \",\\\"error\\\":\\\"\" + escape(error) + \"\\\"}\";\n}\nbool DocumentIndexer::retrieve(const std::string& query, int topK,\n        std::vector<SearchHit>& hits, std::string& error) {\n    hits.clear(); error.clear();\n    if (!validSearchRequest(query, topK)) { error = \"RAG query or top_k is invalid\"; return false; }\n    std::vector<std::vector<float>> queryVectors;\n    if (!embedTexts({query}, queryVectors, error)) return false;\n    try {\n        auto db = openDb(dbPath_);\n",
+          "cosine": 0.5587098205737399,
+          "file": "document_indexer.cpp",
+          "relevance": 0.5687098205737399
+        }
+      ],
+      "tokens_per_second": 45.15713124530911,
+      "truncated": false
+    },
+    {
+      "answer": "Максимальная длина query в DocumentIndexer::validSearchRequest составляет 16000 байт [1].",
+      "case": 2,
+      "context_reduced": true,
+      "expected_term": "16000",
+      "expected_term_present": true,
+      "generation_ms": 10074,
+      "input_tokens": 1568,
+      "input_upper_bound": 6537,
+      "invalid_citations": false,
+      "output_tokens": 29,
+      "question": "Какова максимальная длина query в DocumentIndexer::validSearchRequest?",
+      "repeat": 2,
+      "retrieval_ms": 5834,
+      "sources": [
+        {
+          "chunk_id": "document_indexer.cpp:structural:0027",
+          "content": "bool DocumentIndexer::validSearchRequest(const std::string& query, int topK) {\n    return !trim(query).empty() && query.size() <= 16000 && topK >= 1 && topK <= 20;\n}\nstd::vector<size_t> DocumentIndexer::rankVectors(const std::vector<float>& query,\n        const std::vector<std::vector<float>>& vectors, int topK) {\n    std::vector<size_t> order(vectors.size());\n    for (size_t i = 0; i < order.size(); ++i) order[i] = i;\n    std::stable_sort(order.begin(), order.end(), [&](size_t a, size_t b) {\n        return cosineSimilarity(query, vectors[a]) > cosineSimilarity(query, vectors[b]);\n    });\n    if (topK >= 0 && order.size() > static_cast<size_t>(topK)) order.resize(topK);\n    return order;\n}\nbool DocumentIndexer::embedTexts(const std::vector<std::string>& texts,\n        std::vector<std::vector<float>>& vectors, std::string& error) {\n    vectors.clear(); error.clear();\n    for (size_t start = 0; start < texts.size(); start += kBatchSize) {\n",
+          "cosine": 0.6397245435466054,
+          "file": "document_indexer.cpp",
+          "relevance": 0.7497245435466053
+        },
+        {
+          "chunk_id": "document_indexer.h:structural:0007",
+          "content": "class DocumentIndexer {\npublic:\n    DocumentIndexer();\n    ~DocumentIndexer();\n    std::string statusJson();\n    bool start(std::string& error);\n    bool ensureReady(bool& ready, std::string& error);\n    bool retrieve(const std::string& query, int topK, std::vector<SearchHit>& hits, std::string& error);\n    static std::vector<Chunk> structuralChunks(const Document& document, size_t maxChunk=2200);\n    static double cosineSimilarity(const std::vector<float>& a, const std::vector<float>& b);\n    static bool validSearchRequest(const std::string& query, int topK);\n    static std::vector<size_t> rankVectors(const std::vector<float>& query, const std::vector<std::vector<float>>& vectors, int topK);\n    static std::string databasePath();\n    static CorpusStats inspectCorpus(const std::string& root);\n    static bool embedTexts(const std::vector<std::string>& texts, std::vector<std::vector<float>>& vectors, std::string& error);\nprivate:\n    void runJob();\n    bool hasIndex(std::string& error) const;\n",
+          "cosine": 0.6438533008646078,
+          "file": "document_indexer.h",
+          "relevance": 0.6538533008646078
+        },
+        {
+          "chunk_id": "web_server.cpp:structural:0031",
+          "content": "} else if (useRag) {\n                        if (!document_index::DocumentIndexer::validSearchRequest(prompt, 5)) {\n                            success = false; error = \"RAG query is empty or too long\";\n                        } else {\n                            success = documentIndexer.ensureReady(ready, error);\n                            if (success && ready) {\n                                std::vector<document_index::SearchHit> hits;\n                                success = documentIndexer.retrieve(prompt, 5, hits, error);\n                                if (success) {\n                                    context = \"{\\\"retrieved_chunks\\\":[\";\n                                    for (const auto& hit : hits) {\n                                        if (!sources.empty()) context += ',';\n                                        // Limit text sent to the model, keeping UTF-8 boundaries intact.\n                                        size_t end = std::min<size_t>(hit.chunk.content.size(), 6000);\n",
+          "cosine": 0.5890124316587722,
+          "file": "web_server.cpp",
+          "relevance": 0.6490124316587722
+        },
+        {
+          "chunk_id": "document_indexer.cpp:structural:0035",
+          "content": "std::string DocumentIndexer::statusJson() {\n    std::lock_guard<std::mutex> lock(mutex_);\n    std::string error;\n    const bool ready = !running_ && hasIndex(error);\n    if (error.empty()) error = jobError_;\n    return \"{\\\"ready\\\":\" + std::string(ready ? \"true\" : \"false\") +\n        \",\\\"running\\\":\" + (running_ ? \"true\" : \"false\") + \",\\\"phase\\\":\\\"\" + escape(phase_) +\n        \"\\\",\\\"progress\\\":\" + std::to_string(progress_) + \",\\\"total\\\":\" + std::to_string(progressTotal_) +\n        \",\\\"error\\\":\\\"\" + escape(error) + \"\\\"}\";\n}\nbool DocumentIndexer::retrieve(const std::string& query, int topK,\n        std::vector<SearchHit>& hits, std::string& error) {\n    hits.clear(); error.clear();\n    if (!validSearchRequest(query, topK)) { error = \"RAG query or top_k is invalid\"; return false; }\n    std::vector<std::vector<float>> queryVectors;\n    if (!embedTexts({query}, queryVectors, error)) return false;\n    try {\n        auto db = openDb(dbPath_);\n",
+          "cosine": 0.5587098205737399,
+          "file": "document_indexer.cpp",
+          "relevance": 0.5687098205737399
+        }
+      ],
+      "tokens_per_second": 45.41866613208374,
+      "truncated": false
+    },
+    {
+      "answer": "Алгоритм сходства, используемый в DocumentIndexer::rankVectors, — это сортировка по косинусному сходству. Факт [2].",
+      "case": 3,
+      "context_reduced": true,
+      "expected_term": "cosine",
+      "expected_term_present": true,
+      "generation_ms": 10414,
+      "input_tokens": 1323,
+      "input_upper_bound": 5518,
+      "invalid_citations": false,
+      "output_tokens": 44,
+      "question": "Какой алгоритм сходства используется в DocumentIndexer::rankVectors?",
+      "repeat": 1,
+      "retrieval_ms": 5425,
+      "sources": [
+        {
+          "chunk_id": "document_indexer.h:structural:0007",
+          "content": "class DocumentIndexer {\npublic:\n    DocumentIndexer();\n    ~DocumentIndexer();\n    std::string statusJson();\n    bool start(std::string& error);\n    bool ensureReady(bool& ready, std::string& error);\n    bool retrieve(const std::string& query, int topK, std::vector<SearchHit>& hits, std::string& error);\n    static std::vector<Chunk> structuralChunks(const Document& document, size_t maxChunk=2200);\n    static double cosineSimilarity(const std::vector<float>& a, const std::vector<float>& b);\n    static bool validSearchRequest(const std::string& query, int topK);\n    static std::vector<size_t> rankVectors(const std::vector<float>& query, const std::vector<std::vector<float>>& vectors, int topK);\n    static std::string databasePath();\n    static CorpusStats inspectCorpus(const std::string& root);\n    static bool embedTexts(const std::vector<std::string>& texts, std::vector<std::vector<float>>& vectors, std::string& error);\nprivate:\n    void runJob();\n    bool hasIndex(std::string& error) const;\n",
+          "cosine": 0.659075510815759,
+          "file": "document_indexer.h",
+          "relevance": 0.659075510815759
+        },
+        {
+          "chunk_id": "document_indexer.cpp:structural:0027",
+          "content": "bool DocumentIndexer::validSearchRequest(const std::string& query, int topK) {\n    return !trim(query).empty() && query.size() <= 16000 && topK >= 1 && topK <= 20;\n}\nstd::vector<size_t> DocumentIndexer::rankVectors(const std::vector<float>& query,\n        const std::vector<std::vector<float>>& vectors, int topK) {\n    std::vector<size_t> order(vectors.size());\n    for (size_t i = 0; i < order.size(); ++i) order[i] = i;\n    std::stable_sort(order.begin(), order.end(), [&](size_t a, size_t b) {\n        return cosineSimilarity(query, vectors[a]) > cosineSimilarity(query, vectors[b]);\n    });\n    if (topK >= 0 && order.size() > static_cast<size_t>(topK)) order.resize(topK);\n    return order;\n}\nbool DocumentIndexer::embedTexts(const std::vector<std::string>& texts,\n        std::vector<std::vector<float>>& vectors, std::string& error) {\n    vectors.clear(); error.clear();\n    for (size_t start = 0; start < texts.size(); start += kBatchSize) {\n",
+          "cosine": 0.602590677023268,
+          "file": "document_indexer.cpp",
+          "relevance": 0.652590677023268
+        },
+        {
+          "chunk_id": "document_indexer.cpp:structural:0032",
+          "content": "void DocumentIndexer::runJob() {\n    std::string error;\n    try {\n        const auto started = std::chrono::steady_clock::now();\n        CorpusStats corpus;\n        const auto documents = loadDocuments(fs::current_path(), corpus);\n        std::vector<Chunk> chunks;\n        for (const auto& document : documents) {\n            auto more = structuralChunks(document);\n            chunks.insert(chunks.end(), std::make_move_iterator(more.begin()), std::make_move_iterator(more.end()));\n        }\n        if (chunks.empty()) throw std::runtime_error(\"No project source documents found\");\n        {\n            std::lock_guard<std::mutex> lock(mutex_);\n            corpus_ = corpus; phase_ = \"Generating embeddings\"; progressTotal_ = static_cast<int>(chunks.size());\n        }\n        std::vector<std::vector<float>> vectors;\n        size_t dimension = 0;\n        for (size_t i = 0; i < chunks.size(); i += kBatchSize) {\n            std::vector<std::string> batch;\n",
+          "cosine": 0.5895090161103451,
+          "file": "document_indexer.cpp",
+          "relevance": 0.5895090161103451
+        },
+        {
+          "chunk_id": "document_indexer.cpp:structural:0002",
+          "content": "namespace document_index {",
+          "cosine": 0.579389471847653,
+          "file": "document_indexer.cpp",
+          "relevance": 0.579389471847653
+        }
+      ],
+      "tokens_per_second": 45.628764373060775,
+      "truncated": false
+    },
+    {
+      "answer": "Алгоритм сходства, используемый в DocumentIndexer::rankVectors, — это сортировка по косинусной мере сходства между вектором запроса и векторами документов [2].",
+      "case": 3,
+      "context_reduced": true,
+      "expected_term": "cosine",
+      "expected_term_present": true,
+      "generation_ms": 10653,
+      "input_tokens": 1323,
+      "input_upper_bound": 5518,
+      "invalid_citations": false,
+      "output_tokens": 53,
+      "question": "Какой алгоритм сходства используется в DocumentIndexer::rankVectors?",
+      "repeat": 2,
+      "retrieval_ms": 6661,
+      "sources": [
+        {
+          "chunk_id": "document_indexer.h:structural:0007",
+          "content": "class DocumentIndexer {\npublic:\n    DocumentIndexer();\n    ~DocumentIndexer();\n    std::string statusJson();\n    bool start(std::string& error);\n    bool ensureReady(bool& ready, std::string& error);\n    bool retrieve(const std::string& query, int topK, std::vector<SearchHit>& hits, std::string& error);\n    static std::vector<Chunk> structuralChunks(const Document& document, size_t maxChunk=2200);\n    static double cosineSimilarity(const std::vector<float>& a, const std::vector<float>& b);\n    static bool validSearchRequest(const std::string& query, int topK);\n    static std::vector<size_t> rankVectors(const std::vector<float>& query, const std::vector<std::vector<float>>& vectors, int topK);\n    static std::string databasePath();\n    static CorpusStats inspectCorpus(const std::string& root);\n    static bool embedTexts(const std::vector<std::string>& texts, std::vector<std::vector<float>>& vectors, std::string& error);\nprivate:\n    void runJob();\n    bool hasIndex(std::string& error) const;\n",
+          "cosine": 0.659075510815759,
+          "file": "document_indexer.h",
+          "relevance": 0.659075510815759
+        },
+        {
+          "chunk_id": "document_indexer.cpp:structural:0027",
+          "content": "bool DocumentIndexer::validSearchRequest(const std::string& query, int topK) {\n    return !trim(query).empty() && query.size() <= 16000 && topK >= 1 && topK <= 20;\n}\nstd::vector<size_t> DocumentIndexer::rankVectors(const std::vector<float>& query,\n        const std::vector<std::vector<float>>& vectors, int topK) {\n    std::vector<size_t> order(vectors.size());\n    for (size_t i = 0; i < order.size(); ++i) order[i] = i;\n    std::stable_sort(order.begin(), order.end(), [&](size_t a, size_t b) {\n        return cosineSimilarity(query, vectors[a]) > cosineSimilarity(query, vectors[b]);\n    });\n    if (topK >= 0 && order.size() > static_cast<size_t>(topK)) order.resize(topK);\n    return order;\n}\nbool DocumentIndexer::embedTexts(const std::vector<std::string>& texts,\n        std::vector<std::vector<float>>& vectors, std::string& error) {\n    vectors.clear(); error.clear();\n    for (size_t start = 0; start < texts.size(); start += kBatchSize) {\n",
+          "cosine": 0.602590677023268,
+          "file": "document_indexer.cpp",
+          "relevance": 0.652590677023268
+        },
+        {
+          "chunk_id": "document_indexer.cpp:structural:0032",
+          "content": "void DocumentIndexer::runJob() {\n    std::string error;\n    try {\n        const auto started = std::chrono::steady_clock::now();\n        CorpusStats corpus;\n        const auto documents = loadDocuments(fs::current_path(), corpus);\n        std::vector<Chunk> chunks;\n        for (const auto& document : documents) {\n            auto more = structuralChunks(document);\n            chunks.insert(chunks.end(), std::make_move_iterator(more.begin()), std::make_move_iterator(more.end()));\n        }\n        if (chunks.empty()) throw std::runtime_error(\"No project source documents found\");\n        {\n            std::lock_guard<std::mutex> lock(mutex_);\n            corpus_ = corpus; phase_ = \"Generating embeddings\"; progressTotal_ = static_cast<int>(chunks.size());\n        }\n        std::vector<std::vector<float>> vectors;\n        size_t dimension = 0;\n        for (size_t i = 0; i < chunks.size(); i += kBatchSize) {\n            std::vector<std::string> batch;\n",
+          "cosine": 0.5895090161103451,
+          "file": "document_indexer.cpp",
+          "relevance": 0.5895090161103451
+        },
+        {
+          "chunk_id": "document_indexer.cpp:structural:0002",
+          "content": "namespace document_index {",
+          "cosine": 0.579389471847653,
+          "file": "document_indexer.cpp",
+          "relevance": 0.579389471847653
+        }
+      ],
+      "tokens_per_second": 45.61922066877778,
+      "truncated": false
+    }
+  ],
+  "successful_requests": 6
+}

@@ -1,0 +1,818 @@
+﻿{
+    "scope":  "RAM: all ollama/llama processes; GPU: total device usage including other applications; not isolated per request",
+    "exit_code":  null,
+    "peak_ollama_working_set_mb":  1200.93,
+    "peak_gpu_total_used_mb":  6035,
+    "samples":  [
+                    {
+                        "utc":  "2026-10-10T16:07:24.7409924Z",
+                        "ollama_working_set_mb":  970.2,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:25.3141231Z",
+                        "ollama_working_set_mb":  970.2,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:25.8703932Z",
+                        "ollama_working_set_mb":  970.2,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:26.4444374Z",
+                        "ollama_working_set_mb":  970.2,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:27.1172493Z",
+                        "ollama_working_set_mb":  131.04,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:27.6795805Z",
+                        "ollama_working_set_mb":  388.1,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:28.2536119Z",
+                        "ollama_working_set_mb":  293.05,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:28.8993080Z",
+                        "ollama_working_set_mb":  323.24,
+                        "gpu_total_used_mb":  8
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:29.4717702Z",
+                        "ollama_working_set_mb":  402.38,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:30.0267630Z",
+                        "ollama_working_set_mb":  405.05,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:30.5727007Z",
+                        "ollama_working_set_mb":  1024.88,
+                        "gpu_total_used_mb":  669
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:31.1325367Z",
+                        "ollama_working_set_mb":  1020.94,
+                        "gpu_total_used_mb":  669
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:31.6860174Z",
+                        "ollama_working_set_mb":  1084.82,
+                        "gpu_total_used_mb":  735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:32.3744247Z",
+                        "ollama_working_set_mb":  131.75,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:33.0171641Z",
+                        "ollama_working_set_mb":  293.76,
+                        "gpu_total_used_mb":  9
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:33.7375968Z",
+                        "ollama_working_set_mb":  141.89,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:34.2865655Z",
+                        "ollama_working_set_mb":  324.28,
+                        "gpu_total_used_mb":  17
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:34.8532732Z",
+                        "ollama_working_set_mb":  384.07,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:35.4064356Z",
+                        "ollama_working_set_mb":  757.25,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:35.9733543Z",
+                        "ollama_working_set_mb":  757.29,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:36.5423295Z",
+                        "ollama_working_set_mb":  757.32,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:37.0989528Z",
+                        "ollama_working_set_mb":  757.36,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:37.6702939Z",
+                        "ollama_working_set_mb":  757.39,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:38.2434353Z",
+                        "ollama_working_set_mb":  757.43,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:38.8152881Z",
+                        "ollama_working_set_mb":  757.44,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:39.3790794Z",
+                        "ollama_working_set_mb":  757.44,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:39.9457214Z",
+                        "ollama_working_set_mb":  753.44,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:40.5055551Z",
+                        "ollama_working_set_mb":  854.88,
+                        "gpu_total_used_mb":  6029
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:41.0702218Z",
+                        "ollama_working_set_mb":  946.86,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:41.6288025Z",
+                        "ollama_working_set_mb":  969.73,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:42.2017070Z",
+                        "ollama_working_set_mb":  992.11,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:42.7613152Z",
+                        "ollama_working_set_mb":  144.25,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:43.3164973Z",
+                        "ollama_working_set_mb":  432.16,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:43.9044458Z",
+                        "ollama_working_set_mb":  295.72,
+                        "gpu_total_used_mb":  8
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:44.4689740Z",
+                        "ollama_working_set_mb":  133.41,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:45.0191288Z",
+                        "ollama_working_set_mb":  406.31,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:45.5961078Z",
+                        "ollama_working_set_mb":  409.98,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:46.1513276Z",
+                        "ollama_working_set_mb":  1002.97,
+                        "gpu_total_used_mb":  669
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:46.7203744Z",
+                        "ollama_working_set_mb":  999,
+                        "gpu_total_used_mb":  669
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:47.2845771Z",
+                        "ollama_working_set_mb":  1093.8,
+                        "gpu_total_used_mb":  753
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:47.9637747Z",
+                        "ollama_working_set_mb":  133.82,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:48.5232036Z",
+                        "ollama_working_set_mb":  212.69,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:49.2179167Z",
+                        "ollama_working_set_mb":  142.08,
+                        "gpu_total_used_mb":  8
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:49.8805357Z",
+                        "ollama_working_set_mb":  277.46,
+                        "gpu_total_used_mb":  8
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:50.4468885Z",
+                        "ollama_working_set_mb":  770.41,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:50.9947396Z",
+                        "ollama_working_set_mb":  770.57,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:51.5429662Z",
+                        "ollama_working_set_mb":  770.6,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:52.1149410Z",
+                        "ollama_working_set_mb":  756.53,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:52.6866222Z",
+                        "ollama_working_set_mb":  756.56,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:53.2637072Z",
+                        "ollama_working_set_mb":  756.59,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:53.8104313Z",
+                        "ollama_working_set_mb":  756.62,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:54.3691176Z",
+                        "ollama_working_set_mb":  756.62,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:54.9312637Z",
+                        "ollama_working_set_mb":  752.62,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:55.4995978Z",
+                        "ollama_working_set_mb":  912.26,
+                        "gpu_total_used_mb":  6033
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:56.0740525Z",
+                        "ollama_working_set_mb":  948.15,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:56.6303732Z",
+                        "ollama_working_set_mb":  971.01,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:57.2364164Z",
+                        "ollama_working_set_mb":  987.11,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:58.2206869Z",
+                        "ollama_working_set_mb":  294.54,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:58.8960941Z",
+                        "ollama_working_set_mb":  278.12,
+                        "gpu_total_used_mb":  8
+                    },
+                    {
+                        "utc":  "2026-10-10T16:07:59.4488715Z",
+                        "ollama_working_set_mb":  198.46,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:00.0080983Z",
+                        "ollama_working_set_mb":  136.38,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:00.5756603Z",
+                        "ollama_working_set_mb":  431.85,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:01.1216849Z",
+                        "ollama_working_set_mb":  426.96,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:01.6780398Z",
+                        "ollama_working_set_mb":  1024.31,
+                        "gpu_total_used_mb":  669
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:02.2390092Z",
+                        "ollama_working_set_mb":  1020.34,
+                        "gpu_total_used_mb":  669
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:02.7876550Z",
+                        "ollama_working_set_mb":  1118.01,
+                        "gpu_total_used_mb":  753
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:03.4499854Z",
+                        "ollama_working_set_mb":  133.54,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:04.0185397Z",
+                        "ollama_working_set_mb":  170.03,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:04.5882236Z",
+                        "ollama_working_set_mb":  137.85,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:05.1391595Z",
+                        "ollama_working_set_mb":  423.41,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:05.6988554Z",
+                        "ollama_working_set_mb":  416.55,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:06.2542404Z",
+                        "ollama_working_set_mb":  759.64,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:06.8177887Z",
+                        "ollama_working_set_mb":  759.67,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:07.3759204Z",
+                        "ollama_working_set_mb":  759.7,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:07.9512138Z",
+                        "ollama_working_set_mb":  759.73,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:08.5066688Z",
+                        "ollama_working_set_mb":  757.45,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:09.0731526Z",
+                        "ollama_working_set_mb":  757.48,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:09.6458153Z",
+                        "ollama_working_set_mb":  757.49,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:10.2135586Z",
+                        "ollama_working_set_mb":  757.49,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:10.7716840Z",
+                        "ollama_working_set_mb":  787.51,
+                        "gpu_total_used_mb":  6003
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:11.3779157Z",
+                        "ollama_working_set_mb":  948.59,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:11.9508994Z",
+                        "ollama_working_set_mb":  988.7,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:12.5673417Z",
+                        "ollama_working_set_mb":  1005.48,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:13.6067810Z",
+                        "ollama_working_set_mb":  295.44,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:14.2911714Z",
+                        "ollama_working_set_mb":  273.62,
+                        "gpu_total_used_mb":  9
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:14.8828693Z",
+                        "ollama_working_set_mb":  295.63,
+                        "gpu_total_used_mb":  9
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:15.5186265Z",
+                        "ollama_working_set_mb":  296.16,
+                        "gpu_total_used_mb":  9
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:16.0882641Z",
+                        "ollama_working_set_mb":  498.25,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:16.6473139Z",
+                        "ollama_working_set_mb":  492.52,
+                        "gpu_total_used_mb":  411
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:17.2172310Z",
+                        "ollama_working_set_mb":  1024.98,
+                        "gpu_total_used_mb":  669
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:17.7751110Z",
+                        "ollama_working_set_mb":  1021.02,
+                        "gpu_total_used_mb":  669
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:18.3586809Z",
+                        "ollama_working_set_mb":  1200.93,
+                        "gpu_total_used_mb":  753
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:19.3526072Z",
+                        "ollama_working_set_mb":  301.76,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:20.0359020Z",
+                        "ollama_working_set_mb":  328.16,
+                        "gpu_total_used_mb":  9
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:20.5984979Z",
+                        "ollama_working_set_mb":  301.91,
+                        "gpu_total_used_mb":  9
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:21.1409955Z",
+                        "ollama_working_set_mb":  140.29,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:21.6907344Z",
+                        "ollama_working_set_mb":  430.02,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:22.2500945Z",
+                        "ollama_working_set_mb":  774.38,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:22.8051142Z",
+                        "ollama_working_set_mb":  774.47,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:23.3585954Z",
+                        "ollama_working_set_mb":  774.5,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:23.9297809Z",
+                        "ollama_working_set_mb":  774.55,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:24.4885600Z",
+                        "ollama_working_set_mb":  774.57,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:25.0646373Z",
+                        "ollama_working_set_mb":  774.61,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:25.6328908Z",
+                        "ollama_working_set_mb":  774.61,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:26.1903425Z",
+                        "ollama_working_set_mb":  774.61,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:26.7555270Z",
+                        "ollama_working_set_mb":  862.68,
+                        "gpu_total_used_mb":  6011
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:27.3139494Z",
+                        "ollama_working_set_mb":  948.88,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:27.8669683Z",
+                        "ollama_working_set_mb":  988.91,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:28.4808508Z",
+                        "ollama_working_set_mb":  999.58,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:29.0489402Z",
+                        "ollama_working_set_mb":  142.53,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:29.6086823Z",
+                        "ollama_working_set_mb":  414.21,
+                        "gpu_total_used_mb":  9
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:30.2170577Z",
+                        "ollama_working_set_mb":  294.54,
+                        "gpu_total_used_mb":  8
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:30.7906471Z",
+                        "ollama_working_set_mb":  136.04,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:31.3455381Z",
+                        "ollama_working_set_mb":  483.07,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:31.9052162Z",
+                        "ollama_working_set_mb":  474.93,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:32.4803429Z",
+                        "ollama_working_set_mb":  1024.29,
+                        "gpu_total_used_mb":  669
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:33.0427579Z",
+                        "ollama_working_set_mb":  1020.36,
+                        "gpu_total_used_mb":  669
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:33.6118194Z",
+                        "ollama_working_set_mb":  1190.85,
+                        "gpu_total_used_mb":  753
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:34.8753819Z",
+                        "ollama_working_set_mb":  147.8,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:35.5290607Z",
+                        "ollama_working_set_mb":  318.76,
+                        "gpu_total_used_mb":  8
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:36.2313915Z",
+                        "ollama_working_set_mb":  164.73,
+                        "gpu_total_used_mb":  9
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:36.7840778Z",
+                        "ollama_working_set_mb":  128.33,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:37.3461017Z",
+                        "ollama_working_set_mb":  415.83,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:37.9081849Z",
+                        "ollama_working_set_mb":  757.86,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:38.4586326Z",
+                        "ollama_working_set_mb":  757.89,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:39.0529790Z",
+                        "ollama_working_set_mb":  757.92,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:39.6114189Z",
+                        "ollama_working_set_mb":  757.96,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:40.1701481Z",
+                        "ollama_working_set_mb":  758,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:40.7270149Z",
+                        "ollama_working_set_mb":  758.02,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:41.2828342Z",
+                        "ollama_working_set_mb":  758.02,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:41.8381371Z",
+                        "ollama_working_set_mb":  758.02,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:42.4248820Z",
+                        "ollama_working_set_mb":  845.7,
+                        "gpu_total_used_mb":  6011
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:42.9805701Z",
+                        "ollama_working_set_mb":  948.83,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:43.5425612Z",
+                        "ollama_working_set_mb":  971.78,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:44.1188211Z",
+                        "ollama_working_set_mb":  971.79,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:45.3502096Z",
+                        "ollama_working_set_mb":  200.76,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:46.0575998Z",
+                        "ollama_working_set_mb":  305.64,
+                        "gpu_total_used_mb":  9
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:46.7496704Z",
+                        "ollama_working_set_mb":  217.71,
+                        "gpu_total_used_mb":  9
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:47.3107238Z",
+                        "ollama_working_set_mb":  129.68,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:47.8645137Z",
+                        "ollama_working_set_mb":  398.14,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:48.4405655Z",
+                        "ollama_working_set_mb":  397.29,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:48.9972209Z",
+                        "ollama_working_set_mb":  471.96,
+                        "gpu_total_used_mb":  91
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:49.5702046Z",
+                        "ollama_working_set_mb":  1004.41,
+                        "gpu_total_used_mb":  669
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:50.1198610Z",
+                        "ollama_working_set_mb":  1000.45,
+                        "gpu_total_used_mb":  669
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:50.7015250Z",
+                        "ollama_working_set_mb":  1170.02,
+                        "gpu_total_used_mb":  753
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:51.9092072Z",
+                        "ollama_working_set_mb":  144.12,
+                        "gpu_total_used_mb":  0
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:52.5513096Z",
+                        "ollama_working_set_mb":  323.39,
+                        "gpu_total_used_mb":  8
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:53.2289866Z",
+                        "ollama_working_set_mb":  236.53,
+                        "gpu_total_used_mb":  8
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:53.8813245Z",
+                        "ollama_working_set_mb":  241,
+                        "gpu_total_used_mb":  8
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:54.4490322Z",
+                        "ollama_working_set_mb":  422.08,
+                        "gpu_total_used_mb":  1627
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:55.0060854Z",
+                        "ollama_working_set_mb":  760.61,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:55.5645974Z",
+                        "ollama_working_set_mb":  760.64,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:56.1210823Z",
+                        "ollama_working_set_mb":  760.68,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:56.6877034Z",
+                        "ollama_working_set_mb":  760.72,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:57.2583809Z",
+                        "ollama_working_set_mb":  760.75,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:57.8229644Z",
+                        "ollama_working_set_mb":  760.78,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:58.3810895Z",
+                        "ollama_working_set_mb":  760.78,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:58.9407136Z",
+                        "ollama_working_set_mb":  756.78,
+                        "gpu_total_used_mb":  4735
+                    },
+                    {
+                        "utc":  "2026-10-10T16:08:59.5553579Z",
+                        "ollama_working_set_mb":  849.21,
+                        "gpu_total_used_mb":  6011
+                    },
+                    {
+                        "utc":  "2026-10-10T16:09:00.1728049Z",
+                        "ollama_working_set_mb":  952.08,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:09:00.7307687Z",
+                        "ollama_working_set_mb":  975.13,
+                        "gpu_total_used_mb":  6035
+                    },
+                    {
+                        "utc":  "2026-10-10T16:09:01.2865637Z",
+                        "ollama_working_set_mb":  975.13,
+                        "gpu_total_used_mb":  6035
+                    }
+                ]
+}

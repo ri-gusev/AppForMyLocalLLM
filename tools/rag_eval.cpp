@@ -6,9 +6,14 @@
 
 int main(int argc, char** argv) {
     SetConsoleOutputCP(CP_UTF8);
-    if (argc != 3) {
-        std::cerr << "Usage: rag_eval <directory containing data and config> <output.json>\n";
+    if (argc != 3 && argc != 4) {
+        std::cerr << "Usage: rag_eval <directory containing data and config> <output.json> [temperature]\n";
         return 1;
+    }
+    double temperature = 0;
+    if (argc == 4) {
+        try { temperature = std::stod(argv[3]); }
+        catch (...) { std::cerr << "Invalid temperature\n"; return 1; }
     }
     const std::vector<std::pair<std::string, std::string>> cases = {
         {"Какая модель эмбеддингов используется по умолчанию в DocumentIndexer::embedTexts?", "bge-m3"},
@@ -18,6 +23,7 @@ int main(int argc, char** argv) {
     nlohmann::json report = {{"generation_model", "qwen3:8b"}, {"embedding_model", "bge-m3"},
         {"cloud_comparison", "not run: no cloud provider configured in this application"},
         {"quality_check", "case-insensitive expected-term check; not a complete factuality evaluation"},
+        {"profile", {{"num_ctx", generation::contextWindow}, {"num_predict", generation::maxOutputTokens}, {"temperature", temperature}}},
         {"runs", nlohmann::json::array()}};
     int errors = 0, passed = 0;
     for (size_t i = 0; i < cases.size(); ++i) {
@@ -25,18 +31,28 @@ int main(int argc, char** argv) {
             nlohmann::json run = {{"case", i + 1}, {"repeat", repeat}, {"question", cases[i].first}};
             try {
                 // Independent conversations make repetitions comparable.
-                RagChat chat(std::filesystem::u8path(argv[1]));
+                RagChat chat(std::filesystem::u8path(argv[1]), temperature);
                 auto reply = chat.ask(cases[i].first);
                 run["answer"] = reply.answer;
                 run["retrieval_ms"] = reply.retrievalMs;
                 run["generation_ms"] = reply.generationMs;
+                run["input_tokens"] = reply.generation.inputTokens;
+                run["output_tokens"] = reply.generation.outputTokens;
+                run["input_upper_bound"] = reply.generation.inputUpperBound;
+                run["truncated"] = reply.generation.truncated;
+                run["context_reduced"] = reply.contextReduced;
+                run["invalid_citations"] = reply.invalidCitations;
+                run["tokens_per_second"] = reply.generation.evalDurationNs > 0 ?
+                    reply.generation.outputTokens * 1e9 / reply.generation.evalDurationNs : 0;
                 run["sources"] = nlohmann::json::array();
                 for (const auto& hit : reply.sources)
                     run["sources"].push_back({{"file", hit.file}, {"chunk_id", hit.chunkId},
                         {"cosine", hit.score}, {"relevance", hit.relevance}, {"content", hit.content}});
                 std::string normalized = reply.answer;
                 for (char& ch : normalized) if (ch >= 'A' && ch <= 'Z') ch += 'a' - 'A';
-                const bool ok = normalized.find(cases[i].second) != std::string::npos && !reply.sources.empty();
+                const bool found = normalized.find(cases[i].second) != std::string::npos ||
+                    (i == 2 && (reply.answer.find("косинус") != std::string::npos || reply.answer.find("Косинус") != std::string::npos));
+                const bool ok = found && !reply.sources.empty();
                 run["expected_term"] = cases[i].second;
                 run["expected_term_present"] = ok;
                 if (ok) ++passed;

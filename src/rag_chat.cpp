@@ -1,4 +1,5 @@
 #include "rag_chat.h"
+#include "rag_context.h"
 #include <nlohmann/json.hpp>
 #include <sqlite3.h>
 #include <algorithm>
@@ -71,7 +72,7 @@ void rerank(const std::string& question, std::vector<RagHit>& hits) {
 }
 }
 
-RagChat::RagChat(std::filesystem::path baseDirectory) : base_(std::move(baseDirectory)) {}
+RagChat::RagChat(std::filesystem::path baseDirectory, double temperature) : base_(std::move(baseDirectory)), model_("qwen3:8b", temperature) {}
 
 size_t RagChat::addFile(const std::filesystem::path& file, const IndexProgress& progress) {
     return indexDocument(base_ / "data/user_index.db", file, base_, OllamaClient::embed, progress);
@@ -141,6 +142,7 @@ std::vector<RagHit> RagChat::retrieve(const std::string& question) const {
     }
     if (hits.empty()) throw std::runtime_error("Local RAG index contains no document chunks");
     std::stable_sort(hits.begin(), hits.end(), [](const auto& a, const auto& b) { return a.score > b.score; });
+    hits = deduplicateSources(std::move(hits));
     if (hits.size() > static_cast<size_t>(pre)) hits.resize(pre);
     hits.erase(std::remove_if(hits.begin(), hits.end(), [&](const auto& hit) { return hit.score < threshold; }), hits.end());
     rerank(question, hits);
@@ -148,27 +150,32 @@ std::vector<RagHit> RagChat::retrieve(const std::string& question) const {
     return hits;
 }
 
-RagReply RagChat::ask(const std::string& question) {
+RagReply RagChat::ask(const std::string& question, bool useRag) {
     if (question.find_first_not_of(" \t\r\n") == std::string::npos) throw std::runtime_error("Empty question");
     RagReply reply;
     auto start = Clock::now();
+    reply.usedRag = useRag;
+    if (!useRag) {
+        reply.answer = model_.chat(question);
+        reply.generation = model_.lastStats();
+        reply.generationMs = elapsed(start);
+        return reply;
+    }
+    generation::contextByteBudget(question);
     reply.sources = retrieve(question);
     reply.retrievalMs = elapsed(start);
     if (reply.sources.empty()) {
         reply.answer = "В локальном индексе не найдено достаточно подходящих фрагментов для ответа.";
         return reply;
     }
-    auto excerpts = nlohmann::json::array();
-    for (size_t i = 0; i < reply.sources.size(); ++i) {
-        const auto& hit = reply.sources[i];
-        size_t end = std::min<size_t>(hit.content.size(), 6000);
-        while (end < hit.content.size() && end && (static_cast<unsigned char>(hit.content[end]) & 0xc0) == 0x80) --end;
-        excerpts.push_back({{"id", i + 1}, {"file", hit.file}, {"section", hit.section},
-            {"chunk_id", hit.chunkId}, {"page", hit.page}, {"line_start", hit.lineStart},
-            {"line_end", hit.lineEnd}, {"content", hit.content.substr(0, end)}});
-    }
+    auto context = prepareRagContext(question, reply.sources);
+    reply.sources = std::move(context.sources);
+    reply.contextReduced = context.reduced;
+    if (reply.sources.empty()) throw std::runtime_error("Документы не помещаются в контекст. Сократите вопрос.");
     start = Clock::now();
-    reply.answer = model_.chat(question, excerpts.dump());
+    reply.answer = model_.chat(question, context.json);
+    reply.answer = normalizeCitations(reply.answer, reply.sources.size(), reply.invalidCitations);
+    reply.generation = model_.lastStats();
     reply.generationMs = elapsed(start);
     return reply;
 }
@@ -176,6 +183,10 @@ RagReply RagChat::ask(const std::string& question) {
 std::string RagReply::displayText() const {
     std::ostringstream text;
     text << answer;
+    if (generation.truncated) text << "\n\n[Ответ обрезан: достигнут лимит 512 токенов. Уточните вопрос или разбейте его на части.]";
+    if (invalidCitations) text << "\n\n[В ответе есть ссылка на неизвестный источник. Проверьте ответ.]";
+    if (contextReduced) text << "\n\n[Контекст документов сокращён под размер окна.]";
+    if (generation.droppedHistory) text << "\n[Часть ранней истории не включена в этот запрос.]";
     if (!sources.empty()) {
         text << "\n\nИсточники (фрагменты, переданные модели):";
         for (size_t i = 0; i < sources.size(); ++i) {
@@ -186,6 +197,7 @@ std::string RagReply::displayText() const {
             if (!hit.section.empty()) text << " — " << hit.section;
         }
     }
-    text << "\n\nПоиск: " << retrievalMs << " мс · Ответ: " << generationMs << " мс";
+    if (usedRag) text << "\n\nПоиск: " << retrievalMs << " мс · Ответ: " << generationMs << " мс";
+    else text << "\n\nОтвет: " << generationMs << " мс";
     return text.str();
 }
