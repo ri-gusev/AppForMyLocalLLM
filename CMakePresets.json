@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "configurePresets": [{
+    "name": "mingw-debug",
+    "generator": "MinGW Makefiles",
+    "binaryDir": "${sourceDir}/build",
+    "cacheVariables": {"CMAKE_BUILD_TYPE": "Debug"}
+  }],
+  "buildPresets": [{"name": "mingw-debug", "configurePreset": "mingw-debug"}]
+}
