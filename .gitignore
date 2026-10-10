@@ -1,1 +1,3 @@
 /build/
+/data/user_index.db*
+__pycache__/

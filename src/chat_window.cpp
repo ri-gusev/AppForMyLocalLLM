@@ -1,6 +1,7 @@
 #include "chat_window.h"
-#include "ollama_client.h"
+#include "rag_chat.h"
 #include <commctrl.h>
+#include <commdlg.h>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -8,6 +9,7 @@
 
 namespace {
 constexpr int sendId = 100;
+constexpr int addFileId = 101;
 constexpr UINT submitMessage = WM_APP + 1;
 
 std::wstring fromUtf8(const std::string& text) {
@@ -23,16 +25,19 @@ std::string toUtf8(const std::wstring& text) {
     return result;
 }
 struct Conversation {
-    OllamaClient client;
+    explicit Conversation(const std::filesystem::path& base) : client(base) {}
+    RagChat client;
     std::mutex mutex;
     bool ready = false, failed = false;
-    std::string result;
+    std::string result, progress;
 };
 struct WindowState {
-    HWND history = nullptr, input = nullptr, send = nullptr, status = nullptr;
+    explicit WindowState(const std::filesystem::path& base) : conversation(std::make_shared<Conversation>(base)) {}
+    HWND history = nullptr, input = nullptr, send = nullptr, status = nullptr, addFile = nullptr;
     HFONT font = nullptr;
     bool busy = false;
-    std::shared_ptr<Conversation> conversation = std::make_shared<Conversation>();
+    bool importing = false;
+    std::shared_ptr<Conversation> conversation;
 };
 void append(HWND history, const std::wstring& text) {
     std::wstring normalized;
@@ -63,7 +68,7 @@ void send(WindowState& state) {
     std::thread([conversation = state.conversation, text = toUtf8(prompt)] {
         std::string result;
         bool failed = false;
-        try { result = conversation->client.chat(text); }
+        try { result = conversation->client.ask(text).displayText(); }
         catch (const std::exception& error) { result = error.what(); failed = true; }
         std::lock_guard<std::mutex> lock(conversation->mutex);
         conversation->result = std::move(result);
@@ -74,7 +79,66 @@ void send(WindowState& state) {
     append(state.history, L"Вы:\r\n" + prompt + L"\r\n\r\n");
     SetWindowTextW(state.input, L"");
     EnableWindow(state.send, FALSE);
-    SetWindowTextW(state.status, L"Модель отвечает…");
+    EnableWindow(state.addFile, FALSE);
+    SetWindowTextW(state.status, L"Поиск по документам и ответ модели…");
+}
+void importFiles(WindowState& state, std::vector<std::filesystem::path> files) {
+    if (state.busy || files.empty()) return;
+    std::thread([conversation = state.conversation, files = std::move(files)] {
+        std::string result;
+        for (size_t i = 0; i < files.size(); ++i) {
+            const auto name = files[i].filename().u8string();
+            try {
+                {
+                    std::lock_guard<std::mutex> lock(conversation->mutex);
+                    conversation->progress = "Чтение файла " + std::to_string(i + 1) + "/" + std::to_string(files.size()) + ": " + name;
+                }
+                size_t count = conversation->client.addFile(files[i], [&](size_t done, size_t total) {
+                    std::lock_guard<std::mutex> lock(conversation->mutex);
+                    conversation->progress = name + ": индексация " + std::to_string(done) + "/" + std::to_string(total);
+                });
+                result += name + ": проиндексировано фрагментов — " + std::to_string(count) + "\n";
+            } catch (const std::exception& error) {
+                result += name + ": ошибка — " + error.what() + "\n";
+            }
+        }
+        std::lock_guard<std::mutex> lock(conversation->mutex);
+        conversation->result = std::move(result);
+        conversation->failed = false;
+        conversation->progress.clear();
+        conversation->ready = true;
+    }).detach();
+    state.busy = true;
+    state.importing = true;
+    EnableWindow(state.send, FALSE);
+    EnableWindow(state.addFile, FALSE);
+    SetWindowTextW(state.status, L"Чтение и индексация файлов…");
+}
+void chooseFiles(HWND window, WindowState& state) {
+    if (state.busy) return;
+    std::vector<wchar_t> selection(65536, L'\0');
+    OPENFILENAMEW dialog{};
+    dialog.lStructSize = sizeof(dialog);
+    dialog.hwndOwner = window;
+    dialog.lpstrFilter = L"Документы (TXT, MD, PDF, DOCX)\0*.txt;*.md;*.pdf;*.docx\0\0";
+    dialog.lpstrFile = selection.data();
+    dialog.nMaxFile = static_cast<DWORD>(selection.size());
+    dialog.lpstrTitle = L"Добавить файлы в семантический индекс";
+    dialog.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_ALLOWMULTISELECT | OFN_EXPLORER | OFN_NOCHANGEDIR;
+    if (!GetOpenFileNameW(&dialog)) {
+        if (CommDlgExtendedError()) append(state.history, L"Ошибка выбора файлов. Попробуйте выбрать меньше файлов.\r\n\r\n");
+        return;
+    }
+    std::filesystem::path first(selection.data());
+    auto* next = selection.data() + first.wstring().size() + 1;
+    std::vector<std::filesystem::path> files;
+    if (!*next) files.push_back(first);
+    else while (*next) {
+        std::wstring name(next);
+        files.push_back(first / name);
+        next += name.size() + 1;
+    }
+    importFiles(state, std::move(files));
 }
 LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
     auto* state = reinterpret_cast<WindowState*>(GetWindowLongPtrW(window, GWLP_USERDATA));
@@ -91,10 +155,12 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
             WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN, 0, 0, 0, 0, window, nullptr, instance, nullptr);
         state->send = CreateWindowExW(0, L"BUTTON", L"Отправить", WS_CHILD | WS_VISIBLE | WS_TABSTOP |
             BS_PUSHBUTTON, 0, 0, 0, 0, window, reinterpret_cast<HMENU>(sendId), instance, nullptr);
+        state->addFile = CreateWindowExW(0, L"BUTTON", L"Добавить файлы", WS_CHILD | WS_VISIBLE | WS_TABSTOP |
+            BS_PUSHBUTTON, 0, 0, 0, 0, window, reinterpret_cast<HMENU>(addFileId), instance, nullptr);
         state->status = CreateWindowExW(0, L"STATIC", L"qwen3:8b · Enter — отправить · Shift+Enter — новая строка",
             WS_CHILD | WS_VISIBLE, 0, 0, 0, 0, window, nullptr, instance, nullptr);
-        if (!state->history || !state->input || !state->send || !state->status) return -1;
-        for (HWND control : {state->history, state->input, state->send, state->status})
+        if (!state->history || !state->input || !state->send || !state->status || !state->addFile) return -1;
+        for (HWND control : {state->history, state->input, state->send, state->status, state->addFile})
             SendMessageW(control, WM_SETFONT, reinterpret_cast<WPARAM>(state->font), TRUE);
         SendMessageW(state->history, EM_SETLIMITTEXT, 0, 0);
         SendMessageW(state->input, EM_SETLIMITTEXT, 65536, 0);
@@ -104,7 +170,8 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
     case WM_SIZE:
         if (state) {
             int width = LOWORD(lParam), height = HIWORD(lParam);
-            MoveWindow(state->history, 12, 12, width - 24, height - 144, TRUE);
+            MoveWindow(state->addFile, 12, 12, 170, 32, TRUE);
+            MoveWindow(state->history, 12, 56, width - 24, height - 188, TRUE);
             MoveWindow(state->status, 12, height - 123, width - 24, 24, TRUE);
             MoveWindow(state->input, 12, height - 92, width - 156, 80, TRUE);
             MoveWindow(state->send, width - 132, height - 92, 120, 80, TRUE);
@@ -117,6 +184,13 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
         if (state) SetFocus(state->input);
         return 0;
     case WM_COMMAND:
+        if (LOWORD(wParam) == addFileId && HIWORD(wParam) == BN_CLICKED && state) {
+            try { chooseFiles(window, *state); }
+            catch (const std::exception& error) {
+                append(state->history, L"Ошибка: " + fromUtf8(error.what()) + L"\r\n\r\n");
+            }
+            return 0;
+        }
         if (LOWORD(wParam) != sendId || HIWORD(wParam) != BN_CLICKED) break;
         [[fallthrough]];
     case submitMessage:
@@ -131,12 +205,17 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
         if (state && state->busy) {
             std::lock_guard<std::mutex> lock(state->conversation->mutex);
             if (state->conversation->ready) {
-                append(state->history, (state->conversation->failed ? L"Ошибка:\r\n" : L"Qwen:\r\n") +
+                append(state->history, (state->importing ? L"Индексация:\r\n" :
+                    state->conversation->failed ? L"Ошибка:\r\n" : L"Qwen:\r\n") +
                     fromUtf8(state->conversation->result) + L"\r\n\r\n");
                 state->conversation->ready = false;
                 state->busy = false;
+                state->importing = false;
                 EnableWindow(state->send, TRUE);
+                EnableWindow(state->addFile, TRUE);
                 SetWindowTextW(state->status, L"qwen3:8b · Enter — отправить · Shift+Enter — новая строка");
+            } else if (!state->conversation->progress.empty()) {
+                SetWindowTextW(state->status, fromUtf8(state->conversation->progress).c_str());
             }
         }
         return 0;
@@ -159,7 +238,11 @@ int runChatWindow(HINSTANCE instance, int showCommand) {
     windowClass.hCursor = LoadCursorW(nullptr, reinterpret_cast<LPCWSTR>(IDC_ARROW));
     windowClass.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_BTNFACE + 1);
     if (!RegisterClassW(&windowClass)) return 1;
-    WindowState state;
+    std::wstring executable(32768, L'\0');
+    DWORD length = GetModuleFileNameW(nullptr, executable.data(), static_cast<DWORD>(executable.size()));
+    if (length == 0 || length >= executable.size()) return 1;
+    executable.resize(length);
+    WindowState state(std::filesystem::path(executable).parent_path());
     HWND window = CreateWindowExW(0, windowClass.lpszClassName, L"LocalAgent — Qwen", WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, 800, 650, nullptr, nullptr, instance, &state);
     if (!window) {
