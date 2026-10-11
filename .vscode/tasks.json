@@ -1,0 +1,40 @@
+{
+    "tasks": [
+        {
+            "type": "process",
+            "label": "CMake: build local_agent",
+            "command": "cmake",
+            "args": ["--build", "build", "--target", "local_agent"],
+            "dependsOn": "CMake: configure",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "CMake: configure",
+            "type": "process",
+            "command": "cmake",
+            "args": ["--preset", "mingw-debug"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "problemMatcher": []
+        },
+        {
+            "label": "CMake: build local_agent_server",
+            "type": "process",
+            "command": "cmake",
+            "args": ["--build", "build", "--target", "local_agent_server"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "dependsOn": "CMake: configure",
+            "problemMatcher": ["$gcc"],
+            "group": "build"
+        }
+    ],
+    "version": "2.0.0"
+}

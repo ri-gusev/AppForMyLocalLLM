@@ -4,7 +4,10 @@
     "name": "mingw-debug",
     "generator": "MinGW Makefiles",
     "binaryDir": "${sourceDir}/build",
-    "cacheVariables": {"CMAKE_BUILD_TYPE": "Debug"}
+    "cacheVariables": {
+      "CMAKE_BUILD_TYPE": "Debug",
+      "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+    }
   }],
   "buildPresets": [{"name": "mingw-debug", "configurePreset": "mingw-debug"}]
 }

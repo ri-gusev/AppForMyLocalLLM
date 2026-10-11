@@ -7,10 +7,12 @@
 #include <uxtheme.h>
 #include <algorithm>
 #include <cstdlib>
+#include <filesystem>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
+#include <vector>
 
 namespace {
 constexpr int sendId = 100;

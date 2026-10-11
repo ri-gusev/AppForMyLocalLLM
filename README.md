@@ -155,3 +155,191 @@ cmake --build --preset mingw-debug --target document_import_live
 Добавлены более строгий RAG-промпт, бюджет контекста, ограничение истории,
 удаление повторов и предупреждение об обрезании ответа. Подробности:
 [профиль генерации](docs/generation-profile.md), [отчёт](reports/day29-summary.md).
+
+## Day 30 — HTTP API и Cloudflare Tunnel
+
+`local_agent_server` — отдельное консольное приложение в этом же проекте.
+Оно использует существующие `rag_core`, `OllamaClient` и ограничения генерации,
+но не запускает GUI/RAG. Каждый POST создаёт новый OllamaClient: диалоги разных
+клиентов не смешиваются. Сервер слушает **только 127.0.0.1:8080**.
+Настройки Ollama и OLLAMA_HOST не изменяются. Не открывайте порт 11434 наружу.
+
+### Сборка в PowerShell
+
+```powershell
+cmake --preset mingw-debug
+cmake --build build --target local_agent_server
+cmake --build build --target chat_api_tests chat_api_http_tests
+ctest --test-dir build -R '^chat_api' --output-on-failure
+```
+
+Target сервера не зависит от `local_agent.exe` и копирования RAG-данных.
+Нужны существующие C++/JSON/SQLite-зависимости `rag_core`. cpp-httplib 0.20.1
+скачивается при первом configure в `build/deps`, версия и SHA-256 фиксированы
+в `cmake/CppHttplib.cmake`. Зависимость не добавляется в Git.
+Для автономного configure заранее поместите в `build/deps/httplib.h`
+[заголовок этой версии](https://github.com/yhirose/cpp-httplib/tree/v0.20.1):
+SHA-256 `7d3f813d05dad23b9c66eb6d9c1ff3d66f6acfaf6e5900ce960f7990e78079ea`.
+
+### Запуск
+
+Ollama должна быть запущена локально с моделью `qwen3:8b`.
+Проверьте привязки портов, не меняя OLLAMA_HOST:
+
+```powershell
+Get-NetTCPConnection -State Listen -LocalPort 11434 |
+    Select-Object LocalAddress, LocalPort
+```
+
+Ожидается loopback 127.0.0.1; возможный IPv6 loopback ::1 также не доступен
+из сети. Если отображается 0.0.0.0, :: или адрес сетевого интерфейса,
+не запускайте публичную демонстрацию до восстановления локальной привязки Ollama.
+
+В первом терминале введите собственный длинный случайный токен. Он хранится
+только в окружении процесса, не в исходниках, .env или файлах конфигурации:
+
+```powershell
+$apiSecret = Read-Host 'Введите API-токен (случайный, минимум 32 символа)' -AsSecureString
+$env:LOCAL_AGENT_API_KEY = [System.Net.NetworkCredential]::new('', $apiSecret).Password
+.\build\local_agent_server.exe
+```
+
+Токен должен состоять из печатных ASCII-символов без пробелов. Без переменной
+или с некорректным токеном сервер завершится до открытия порта. Для остановки
+нажмите Ctrl+C; затем можно удалить переменную из этого терминала:
+`Remove-Item Env:LOCAL_AGENT_API_KEY`.
+
+### Локальная проверка во втором терминале
+
+```powershell
+Invoke-RestMethod -Uri 'http://127.0.0.1:8080/health'
+# {"status":"ok"}; это доступность API, не проверка готовности модели.
+
+$apiSecret = Read-Host 'Введите тот же API-токен' -AsSecureString
+$apiToken = [System.Net.NetworkCredential]::new('', $apiSecret).Password
+$headers = @{ Authorization = "Bearer $apiToken" }
+$body = @{ prompt = 'Привет! Ответь одной короткой фразой.' } | ConvertTo-Json -Compress
+Invoke-RestMethod -Uri 'http://127.0.0.1:8080/chat' -Method Post `
+    -Headers $headers -ContentType 'application/json; charset=utf-8' `
+    -Body ([System.Text.Encoding]::UTF8.GetBytes($body)) -TimeoutSec 240
+# {"response":"..."}
+
+# Без Authorization ожидается 401:
+try {
+    Invoke-RestMethod -Uri 'http://127.0.0.1:8080/chat' -Method Post `
+        -ContentType 'application/json' -Body '{"prompt":"test"}'
+} catch { [int]$_.Exception.Response.StatusCode }
+
+Get-NetTCPConnection -State Listen -LocalPort 8080 |
+    Select-Object LocalAddress, LocalPort
+# Только 127.0.0.1:8080.
+```
+
+### Публичный HTTPS через Quick Tunnel
+
+Установите `cloudflared` из
+[официальных загрузок Cloudflare](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/).
+В третьем терминале, оставив сервер работающим:
+
+```powershell
+cloudflared tunnel --url http://127.0.0.1:8080
+```
+
+cloudflared напечатает временный HTTPS-адрес вида `https://....trycloudflare.com`.
+Используйте именно напечатанный адрес, тот же Bearer-токен и JSON:
+
+```powershell
+$publicBase = 'https://АДРЕС-ИЗ-CLOUDFLARED.trycloudflare.com'
+Invoke-RestMethod -Uri "$publicBase/health"
+Invoke-RestMethod -Uri "$publicBase/chat" -Method Post `
+    -Headers $headers -ContentType 'application/json; charset=utf-8' `
+    -Body ([System.Text.Encoding]::UTF8.GetBytes($body)) -TimeoutSec 240
+```
+
+Туннель направляется исключительно в API на 8080, **не в Ollama на 11434**.
+Не открывайте порты на роутере и не меняйте OLLAMA_HOST. HTTPS заканчивается
+на Cloudflare; Cloudflare является посредником для запросов и токена.
+В приложении нет CORS, произвольных файловых маршрутов, административных endpoint или
+прокси к Ollama. Страница / и /health публичны, /chat требует токен.
+
+### Лимиты и ошибки
+
+- Тело до 8192 байт, включая chunked-передачу; prompt до 4000 **UTF-8-байт**.
+  Принимается только объект с одним строковым полем prompt и Content-Type application/json.
+  Для надёжной доставки JSON-ошибки в Windows отклонённое тело может
+  дочитываться без сохранения, максимум до 64 КиБ; в модели оно не обрабатывается.
+  При ещё большем/некорректном потоке возможно закрытие соединения на уровне TCP.
+- До 5 POST за скользящие 60 секунд на весь процесс, включая неавторизованные,
+  некорректные и неизвестные POST-маршруты. Отклонённые по rate limit запросы
+  не продлевают окно. /health не расходует этот лимит.
+- Одновременно одна генерация; занятая модель → 429 с Retry-After.
+  На уровне HTTP ограничены пул потоков и очередь; при чрезмерном количестве
+  соединений транспорт может закрыть соединение до разбора HTTP-запроса.
+- 400 — неверный JSON/prompt/фрейминг; 401 — токен; 404 — неизвестный маршрут;
+  405 — метод; 411 — отсутствует длина/Transfer-Encoding; 413 — размер;
+  415 — Content-Type/кодирование; 429 — rate limit или занятая генерация;
+  502 — ошибка Ollama; 504 — таймаут Ollama.
+- Ошибки имеют вид `{"error":{"code":"...","message":"..."}}`.
+  Подробности upstream-ошибок, API-токен и полный prompt не логируются и не возвращаются.
+- Получение небольшого запроса: таймаут простоя чтения 15 с. Он не ограничивает
+  время вычисления модели. Существующий WinHTTP ждёт Ollama до 180 с,
+  запись ответа и примеры клиентов — до 240 с. Разрыв клиента не отменяет
+  уже выполняющийся запрос: слот освобождается после его завершения/ошибки.
+- Ограничение одновременной генерации относится к этому API, не к другим
+  приложениям, обращающимся в Ollama напрямую.
+
+[Quick Tunnel предназначен только для тестирования и демонстраций](https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/):
+временный адрес меняется, нет гарантий доступности, действуют ограничения
+Cloudflare. Для production нужен управляемый Tunnel и полноценный контроль
+доступа. Не передавайте секретные документы в публичную учебную демонстрацию.
+
+Тесты `chat_api` и `chat_api_http` используют тестовую генерацию и не требуют
+Ollama: проверяют ключ, авторизацию, JSON, размеры, окно rate limit, занятость,
+ошибки и реальные loopback HTTP-запросы, включая chunked-тело.
+
+### Мобильный веб-чат
+
+Сервер отдаёт встроенную страницу чата по `GET /`. Дополнительный веб-сервер,
+Node.js, отдельные файлы рядом с EXE и CDN не нужны.
+
+```powershell
+cmake --preset mingw-debug
+cmake --build build --target local_agent_server
+# Остановите предыдущий local_agent_server через Ctrl+C перед пересборкой:
+# Windows не позволяет заменить работающий EXE.
+
+$apiSecret = Read-Host 'API-токен' -AsSecureString
+$env:LOCAL_AGENT_API_KEY = [System.Net.NetworkCredential]::new('', $apiSecret).Password
+.\build\local_agent_server.exe
+```
+
+На ПК откройте `http://127.0.0.1:8080/`. На iPhone откройте корень HTTPS-адреса,
+который выдаёт уже используемый `cloudflared tunnel --url http://127.0.0.1:8080`.
+На телефоне `127.0.0.1` относится к телефону, поэтому нужен адрес туннеля.
+Введите тот же API-токен в поле страницы и отправьте сообщение.
+
+- Ключ хранится только в переменной JavaScript в памяти вкладки. Поле ключа
+  очищается после ввода; localStorage, sessionStorage, cookies и URL не используются.
+  При обновлении/повторном открытии страницы ключ вводится заново. Его корректность
+  проверяется сервером при первом сообщении; 401 снова открывает поле ключа.
+- История отображается только в открытой странице. «Новый чат» очищает её.
+  История не передаётся модели: `/chat` по-прежнему обрабатывает каждый prompt
+  отдельно, без общих пользовательских диалогов.
+- На ПК Enter отправляет сообщение, Shift+Enter добавляет строку. На устройствах
+  с сенсорным вводом Enter добавляет строку, отправка — кнопкой ↑.
+- Есть индикатор генерации, счётчик UTF-8-байт и предварительная проверка размеров
+  prompt/JSON. 401, 429, 413, сбои сети и модели показываются на странице.
+  При 429 учитывается Retry-After; автоматической повторной отправки нет.
+  Неуспешный prompt возвращается в поле, если там ещё нет нового черновика.
+- Клиент ждёт ответ до 240 секунд. Закрытие вкладки/таймаут не отменяет генерацию
+  на сервере. Все существующие лимиты API продолжают действовать.
+- Ответы отображаются как текст, включая код и HTML, без исполнения разметки.
+  Страница не загружает сторонние ресурсы; запросы идут через `fetch('/chat', ...)`
+  на тот же адрес с Bearer-заголовком. Ключ не включён в HTML или логи приложения.
+
+Проверка маршрутов и защиты без Ollama:
+
+```powershell
+cmake --build build --target chat_api_tests chat_api_http_tests
+ctest --test-dir build --output-on-failure
+```
